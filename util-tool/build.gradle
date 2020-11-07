@@ -1,0 +1,48 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
+}
+
+group = 'com.ykoyano.archunit'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
+}
+
+dependencies {
+    implementation project(":")
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.tngtech.archunit:archunit-junit4:0.14.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        compileClasspath += project(":").sourceSets.main.output.classesDirs
+        runtimeClasspath += project(":").sourceSets.main.output.classesDirs
+    }
+}
+
+task scanDependenciesFromControllerToExternalApi(type: JavaExec) {
+    group = "Execution"
+    description = "Run DependencyScannerFromControllerToExternalApi with JavaExecTask"
+    classpath sourceSets.main.runtimeClasspath
+    main = "com.ykoyano.archunit.util.scan.DependencyScannerFromControllerToExternalApi"
+    workingDir = "../"
+}
